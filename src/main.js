@@ -53,8 +53,8 @@ function main() {
     loadModel('lowPolyTree', 'lowPolyTree', 0.3);
     loadModel('fern', 'fern', 0.3, true);
     loadModel('grassModel', 'grassTexture', 1, true, true);
-     loadModel('grassModel', 'flower', 1, true, true);
-  
+    loadModel('grassModel', 'flower', 1, true, true);
+
     animate();
 }
 
@@ -71,14 +71,14 @@ function animate() {
     window.requestAnimationFrame(animate);
 }
 
-function loadModel(model, textureName, scale, transparent, fakelight){
+function loadModel(model, textureName, scale, transparent, fakelight) {
 
-      objLoader.loadObjModel(model,textureName, scale, transparent, fakelight, function (v, t, n, i, texureName, scale, transparent, fakelight) {
+    objLoader.loadObjModel(model, textureName, scale, transparent, fakelight, function (v, t, n, i, texureName, scale, transparent, fakelight) {
 
         rawModel = loader.loadToVao(v, t, n, i);
         var texture = loader.loadTexture(texureName);
-        texture.useFakeLight = ;
-        textuer.isTransparent = ;
+        texture.useFakeLight = fakelight;
+        texture.isTransparent = transparent;
 
         var tex = new ModelTexture(texture);
         model = new TexturedModel(rawModel, tex, textureName);

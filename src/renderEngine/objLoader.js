@@ -15,7 +15,7 @@ var objLoader = (function () {
     }
 
     return {
-        loadObjModel(filename, texture, scale, callback) {
+        loadObjModel(filename, texture, scale,transparent, fakelight, callback) {
             var client = new XMLHttpRequest();
             client.open('GET', 'assets/' + filename + '.obj');
             client.onreadystatechange = function () {

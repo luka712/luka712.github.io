@@ -27,11 +27,12 @@
             gl_Position = u_projectionMatrix * u_viewMatrix * world;
             v_texCoords = a_texCoords; 
 
+            vec3 normal = a_normals;
             if(u_fakeLighting > 0.5){
-                a_normals = vec3(0.0,1.0,0.0);
+                normal = vec3(0.0,1.0,0.0);
             }
 
-            v_surfaceNormal = (world * vec4(a_normals, 0.0)).xyz;
+            v_surfaceNormal = (world * vec4(normal, 0.0)).xyz;
             v_lightVector = u_lightPosition - world.xyz;
             v_toCameraVector = (u_inverseViewMatrix * vec4(0.0,0.0,0.0,1.0)).xyz - world.xyz;
         }
