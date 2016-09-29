@@ -67,7 +67,7 @@ EntityRenderer.prototype = {
         if(texture.isTransparent){
             MasterRenderer.disableBackCull();
         }
-
+        this.shader.loadShineVariables( texture.reflectivity, texture.damper);
         this.shader.loadFakeLighting(texture.useFakeLight);
 
         gl.bindBuffer(b.pBuffer.type, b.pBuffer.buffer);

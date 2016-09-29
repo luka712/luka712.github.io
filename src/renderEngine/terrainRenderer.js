@@ -40,7 +40,7 @@ TerrainRenderer.prototype = {
         var texture = terrain.texture;
         var model = terrain.model;
         this.shader.enableAttribs();
-        this.shader.loadShineVariables(texture.damper, texture.reflectivity);
+        this.shader.loadShineVariables( texture.reflectivity, texture.damper);
         var gl = GL;
         var b = model.buffers;
         
