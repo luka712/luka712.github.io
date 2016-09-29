@@ -52,6 +52,8 @@ function main() {
     loadModel('tree', 'tree', 3);
     loadModel('lowPolyTree', 'lowPolyTree', 0.3);
     loadModel('fern', 'fern', 0.3);
+    loadModel('grassModel', 'grassTexture', 1);
+     loadModel('grassModel', 'flower', 1);
   
     animate();
 }

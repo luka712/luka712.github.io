@@ -42,9 +42,11 @@
          uniform sampler2D u_texture; 
          uniform float u_shineDamper;
          uniform float u_reflectivity;
-         
+
          void main()
          {
+         
+            vec4 color = texture2D(u_texture,v_texCoords);
             vec3 unitSurfaceNormal = normalize(v_surfaceNormal);
             vec3 unitLightVector = normalize(v_lightVector);
             vec3 unitToCameraVector = normalize(v_toCameraVector);
@@ -61,8 +63,11 @@
             float dampedFactor = pow(specularFactor, u_shineDamper);
             vec3 finalSpecular = dampedFactor * u_lightColor * u_reflectivity;
             
+            if(color.a < 0.5){
+                discard;
+            }
          
-            gl_FragColor = vec4(diffuse, 1.0) *  texture2D(u_texture,v_texCoords) + vec4(finalSpecular, 1.0);
+            gl_FragColor = vec4(diffuse, 1.0) * color  + vec4(finalSpecular, 1.0);
          }
     </script>
       <script id="terrainVertexShader" type="notJs">
