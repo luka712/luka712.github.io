@@ -68,6 +68,8 @@ EntityRenderer.prototype = {
             MasterRenderer.disableBackCull();
         }
 
+        this.shader.loadFakeLighting(texture.useFakeLight);
+
         gl.bindBuffer(b.pBuffer.type, b.pBuffer.buffer);
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 

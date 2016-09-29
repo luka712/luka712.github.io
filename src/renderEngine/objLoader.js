@@ -79,7 +79,7 @@ var objLoader = (function () {
                         verticesArray.push(vertex.z);
                     });
 
-                    callback(verticesArray, textureArray, normalsArray, indices, texture, scale);
+                    callback(verticesArray, textureArray, normalsArray, indices, texture, scale, transparent, fakelight);
                 }
             }
             client.send();
