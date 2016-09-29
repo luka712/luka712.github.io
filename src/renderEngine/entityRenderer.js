@@ -5,8 +5,6 @@ function EntityRenderer(shader) {
     var FAR_PLANE = 1000;
 
     this.shader = shader;
-    GL.enable(GL.CULL_FACE);
-    GL.cullFace(GL.BACK);
     var projectionMatrix = mat4.create();
     projectionMatrix = mat4.perspective(projectionMatrix, FOV, WIDTH / HEIGHT, NEAR_PLANE, FAR_PLANE);
     shader.start();

@@ -18,13 +18,18 @@
         uniform mat4 u_viewMatrix;
         uniform vec3 u_lightPosition;
         uniform mat4 u_inverseViewMatrix;
-        
+        uniform float u_fakeLighting;
+
         
         void main() 
         {
             vec4 world = u_transformationMatrix * vec4(a_position,1.0);
             gl_Position = u_projectionMatrix * u_viewMatrix * world;
             v_texCoords = a_texCoords; 
+
+            if(u_fakeLighting > 0.5){
+                a_normals = vec3(0.0,1.0,0.0);
+            }
 
             v_surfaceNormal = (world * vec4(a_normals, 0.0)).xyz;
             v_lightVector = u_lightPosition - world.xyz;

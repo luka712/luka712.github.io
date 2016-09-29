@@ -48,3 +48,12 @@ MasterRenderer.prototype = {
         this.terrainShader.cleanUp();
     }
 }
+
+MasterRenderer.enableBackCull = function () {
+    GL.enable(GL.CULL_FACE);
+    GL.cullFace(GL.BACK);
+}
+
+MasterRenderer.disableBackCull = function () {
+    GL.disable(GL.CULL_FACE);
+}
