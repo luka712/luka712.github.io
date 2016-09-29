@@ -4,6 +4,7 @@ function MasterRenderer() {
     this.terrainShader = new TerrainShader();
     this.renderer = new EntityRenderer(this.shader);
     this.terrainRenderer = new TerrainRenderer(this.terrainShader);
+    MasterRenderer.enableBackCull();
 
     this.entities = {};
     this.terrains = [];

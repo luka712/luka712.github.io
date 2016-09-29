@@ -63,7 +63,11 @@ EntityRenderer.prototype = {
         var b = model.buffers;
         var gl = GL;
 
-        //gl.enableVertexAttribArray(sr_vPosition);
+
+        if(texture.isTransparent){
+            MasterRenderer.disableBackCull();
+        }
+
         gl.bindBuffer(b.pBuffer.type, b.pBuffer.buffer);
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
