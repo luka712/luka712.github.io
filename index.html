@@ -1,0 +1,160 @@
+<html>
+
+<head>
+
+<script id="vertexShader" type="notJs">
+        precision mediump float; 
+        attribute vec3 a_position;
+        attribute vec2 a_texCoords;
+        attribute vec3 a_normals;
+        
+        varying vec2 v_texCoords;
+        varying vec3 v_surfaceNormal;
+        varying vec3 v_lightVector;
+        varying vec3 v_toCameraVector;
+        
+        uniform mat4 u_transformationMatrix; 
+        uniform mat4 u_projectionMatrix;
+        uniform mat4 u_viewMatrix;
+        uniform vec3 u_lightPosition;
+        uniform mat4 u_inverseViewMatrix;
+        
+        
+        void main() 
+        {
+            vec4 world = u_transformationMatrix * vec4(a_position,1.0);
+            gl_Position = u_projectionMatrix * u_viewMatrix * world;
+            v_texCoords = a_texCoords; 
+
+            v_surfaceNormal = (world * vec4(a_normals, 0.0)).xyz;
+            v_lightVector = u_lightPosition - world.xyz;
+            v_toCameraVector = (u_inverseViewMatrix * vec4(0.0,0.0,0.0,1.0)).xyz - world.xyz;
+        }
+    </script>
+    <script id="fragmentShader" type="notJs">
+         precision mediump float;
+         varying vec2 v_texCoords;
+         varying vec3 v_surfaceNormal;
+         varying vec3 v_lightVector;
+         varying vec3 v_toCameraVector;
+         
+         uniform vec3 u_lightColor;
+         uniform sampler2D u_texture; 
+         uniform float u_shineDamper;
+         uniform float u_reflectivity;
+         
+         void main()
+         {
+            vec3 unitSurfaceNormal = normalize(v_surfaceNormal);
+            vec3 unitLightVector = normalize(v_lightVector);
+            vec3 unitToCameraVector = normalize(v_toCameraVector);
+            
+            float nDotL = dot(unitSurfaceNormal, unitLightVector);
+            float brightness = max(nDotL, 0.2);
+            vec3 diffuse = brightness * u_lightColor;
+            
+            vec3 lightDirection = v_lightVector;
+            vec3 reflectedLightDirection = reflect(lightDirection, unitSurfaceNormal);
+            
+            float specularFactor = dot(reflectedLightDirection, unitSurfaceNormal);
+            specularFactor = max(specularFactor, 0.0);
+            float dampedFactor = pow(specularFactor, u_shineDamper);
+            vec3 finalSpecular = dampedFactor * u_lightColor * u_reflectivity;
+            
+         
+            gl_FragColor = vec4(diffuse, 1.0) *  texture2D(u_texture,v_texCoords) + vec4(finalSpecular, 1.0);
+         }
+    </script>
+      <script id="terrainVertexShader" type="notJs">
+        precision mediump float; 
+        attribute vec3 a_position;
+        attribute vec2 a_texCoords;
+        attribute vec3 a_normals;
+        
+        varying vec2 v_texCoords;
+        varying vec3 v_surfaceNormal;
+        varying vec3 v_lightVector;
+        varying vec3 v_toCameraVector;
+        
+        uniform mat4 u_transformationMatrix; 
+        uniform mat4 u_projectionMatrix;
+        uniform mat4 u_viewMatrix;
+        uniform vec3 u_lightPosition;
+        uniform mat4 u_inverseViewMatrix;
+        
+        
+        void main() 
+        {
+            vec4 world = u_transformationMatrix * vec4(a_position,1.0);
+            gl_Position = u_projectionMatrix * u_viewMatrix * world;
+            v_texCoords = a_texCoords * 40.0; 
+
+            v_surfaceNormal = (world * vec4(a_normals, 0.0)).xyz;
+            v_lightVector = u_lightPosition - world.xyz;
+            v_toCameraVector = (u_inverseViewMatrix * vec4(0.0,0.0,0.0,1.0)).xyz - world.xyz;
+        }
+    </script>
+    <script id="terrainFragmentShader" type="notJs">
+         precision mediump float;
+         varying vec2 v_texCoords;
+         varying vec3 v_surfaceNormal;
+         varying vec3 v_lightVector;
+         varying vec3 v_toCameraVector;
+         
+         uniform vec3 u_lightColor;
+         uniform sampler2D u_texture; 
+         uniform float u_shineDamper;
+         uniform float u_reflectivity;
+         
+         void main()
+         {
+            vec3 unitSurfaceNormal = normalize(v_surfaceNormal);
+            vec3 unitLightVector = normalize(v_lightVector);
+            vec3 unitToCameraVector = normalize(v_toCameraVector);
+            
+            float nDotL = dot(unitSurfaceNormal, unitLightVector);
+            float brightness = max(nDotL, 0.2);
+            vec3 diffuse = brightness * u_lightColor;
+            
+            vec3 lightDirection = v_lightVector;
+            vec3 reflectedLightDirection = reflect(lightDirection, unitSurfaceNormal);
+            
+            float specularFactor = dot(reflectedLightDirection, unitSurfaceNormal);
+            specularFactor = max(specularFactor, 0.0);
+            float dampedFactor = pow(specularFactor, u_shineDamper);
+            vec3 finalSpecular = dampedFactor * u_lightColor * u_reflectivity;
+            
+         
+            gl_FragColor = vec4(diffuse, 1.0) *  texture2D(u_texture,v_texCoords) + vec4(finalSpecular, 1.0);
+         }
+    </script>
+</head>
+
+<body onload="main()">
+    <canvas id="renderCanvas"></canvas>
+    
+    
+<script src="src/main.js"></script>
+<script src="src/renderEngine/displayManager.js"></script>
+<script src="src/renderEngine/loader.js"></script>
+<script src="src/renderEngine/entityRenderer.js"></script>
+<script src="src/renderEngine/masterRenderer.js"></script>
+<script src="src/renderEngine/terrainRenderer.js"></script>
+<script src="src/renderEngine/models/rawModel.js"></script>
+<script src="src/renderEngine/models/texturedModel.js"></script>
+<script src="src/shaders/shaderProgram.js"></script>
+<script src="src/shaders/terrainShader.js"></script>
+<script src="src/shaders/staticShader.js"></script>
+<script src="src/textures/modelTexture.js"></script>
+<script src="scripts/gl-matrix.js"></script>
+<script src="src/entities/entity.js"></script>
+<script src="src/toolbox/maths.js"></script>
+<script src="src/entities/camera.js"></script>
+<script src="src/toolbox/keyboard.js"></script>
+<script src="src/toolbox/hashTable.js"></script>
+<script src="src/renderEngine/objLoader.js"></script>
+<script src="src/entities/light.js"></script>
+<script src="src/entities/terrain.js"></script>
+</body>
+
+</html>
