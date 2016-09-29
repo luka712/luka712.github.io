@@ -42,7 +42,7 @@ function main() {
     loader = new Loader();
     renderer = new MasterRenderer(shader);
     camera = new Camera();
-    light = new Light([0, 0, -20.0], [1.0, 1.0, 1.0]);
+    light = new Light([0, 15.0, -30.0], [1.0, 1.0, 1.0]);
 
     var grassTexture = new ModelTexture(loader.loadTexture("grass"));
     terrain1 = new Terrain(0, 0, loader, grassTexture);

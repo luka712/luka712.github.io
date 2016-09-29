@@ -39,10 +39,11 @@ TerrainRenderer.prototype = {
     prepareTerrain: function (terrain) {
         var texture = terrain.texture;
         var model = terrain.model;
-        this.shader.enableAttribs();
-        this.shader.loadShineVariables( texture.reflectivity, texture.damper);
         var gl = GL;
         var b = model.buffers;
+
+                this.shader.enableAttribs();
+        this.shader.loadShineVariables( texture.reflectivity, texture.damper);
         
         gl.bindBuffer(b.pBuffer.type, b.pBuffer.buffer);
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);

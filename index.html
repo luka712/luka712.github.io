@@ -32,7 +32,7 @@
                 normal = vec3(0.0,1.0,0.0);
             }
 
-            v_surfaceNormal = (world * vec4(normal, 0.0)).xyz;
+            v_surfaceNormal = (u_transformationMatrix * vec4(normal, 0.0)).xyz;
             v_lightVector = u_lightPosition - world.xyz;
             v_toCameraVector = (u_inverseViewMatrix * vec4(0.0,0.0,0.0,1.0)).xyz - world.xyz;
         }
@@ -100,7 +100,7 @@
             gl_Position = u_projectionMatrix * u_viewMatrix * world;
             v_texCoords = a_texCoords * 40.0; 
 
-            v_surfaceNormal = (world * vec4(a_normals, 0.0)).xyz;
+            v_surfaceNormal = (u_transformationMatrix * vec4(a_normals, 0.0)).xyz;
             v_lightVector = u_lightPosition - world.xyz;
             v_toCameraVector = (u_inverseViewMatrix * vec4(0.0,0.0,0.0,1.0)).xyz - world.xyz;
         }
@@ -130,7 +130,7 @@
             vec3 lightDirection = v_lightVector;
             vec3 reflectedLightDirection = reflect(lightDirection, unitSurfaceNormal);
             
-            float specularFactor = dot(reflectedLightDirection, unitSurfaceNormal);
+            float specularFactor = dot(reflectedLightDirection, unitToCameraVector);
             specularFactor = max(specularFactor, 0.0);
             float dampedFactor = pow(specularFactor, u_shineDamper);
             vec3 finalSpecular = dampedFactor * u_lightColor * u_reflectivity;
