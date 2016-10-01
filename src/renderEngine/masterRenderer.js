@@ -1,4 +1,8 @@
 function MasterRenderer() {
+    
+    this.RED = 0.5;
+    this.BLUE = 0.5;
+    this.GREEN = 0.5;
 
     this.shader = new StaticShader();
     this.terrainShader = new TerrainShader();
@@ -12,16 +16,24 @@ function MasterRenderer() {
 }
 
 MasterRenderer.prototype = {
+    prepare: function () {
+        GL.enable(GL.DEPTH_TEST);
+        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+        GL.clearColor(this.RED, this.GREEN , this.BLUE, 1);
+    },
+
     render: function (sun, camera) {
 
-        this.renderer.prepare();
+        this.prepare();
         this.shader.start();
         this.shader.loadLight(sun);
         this.shader.loadViewMatrix(camera);
+        this.shader.loadSkyColor(this.RED, this.GREEN , this.BLUE)
         this.renderer.render(this.entities);
         this.shader.stop();
         this.terrainShader.start();
         this.terrainShader.loadLight(sun);
+        this.terrainShader.loadSkyColor(this.RED, this.GREEN , this.BLUE);
         this.terrainShader.loadViewMatrix(camera);
         this.terrainRenderer.render(this.terrains);
         this.terrainShader.stop();

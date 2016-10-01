@@ -12,6 +12,7 @@
         varying vec3 v_surfaceNormal;
         varying vec3 v_lightVector;
         varying vec3 v_toCameraVector;
+        varying float v_visibility;
         
         uniform mat4 u_transformationMatrix; 
         uniform mat4 u_projectionMatrix;
@@ -20,11 +21,15 @@
         uniform mat4 u_inverseViewMatrix;
         uniform float u_fakeLighting;
 
+        const float density  = 0.007;
+        const float gradient = 1.5;
+
         
         void main() 
         {
             vec4 world = u_transformationMatrix * vec4(a_position,1.0);
-            gl_Position = u_projectionMatrix * u_viewMatrix * world;
+            vec4 positionRelativeToCam = u_viewMatrix * world;
+            gl_Position = u_projectionMatrix * positionRelativeToCam;
             v_texCoords = a_texCoords; 
 
             vec3 normal = a_normals;
@@ -35,6 +40,11 @@
             v_surfaceNormal = (u_transformationMatrix * vec4(normal, 0.0)).xyz;
             v_lightVector = u_lightPosition - world.xyz;
             v_toCameraVector = (u_inverseViewMatrix * vec4(0.0,0.0,0.0,1.0)).xyz - world.xyz;
+
+            float distance = length( positionRelativeToCam.xyz);
+            v_visibility = exp(-pow(distance * density, gradient));
+            v_visibility = clamp(v_visibility, 0.0, 1.0);
+
         }
     </script>
     <script id="fragmentShader" type="notJs">
@@ -43,11 +53,13 @@
          varying vec3 v_surfaceNormal;
          varying vec3 v_lightVector;
          varying vec3 v_toCameraVector;
+         varying float v_visibility;
          
          uniform vec3 u_lightColor;
          uniform sampler2D u_texture; 
          uniform float u_shineDamper;
          uniform float u_reflectivity;
+         uniform vec3 u_skyColor;
 
          void main()
          {
@@ -74,6 +86,7 @@
             }
          
             gl_FragColor = vec4(diffuse, 1.0) * color  + vec4(finalSpecular, 1.0);
+            gl_FragColor = mix(vec4(u_skyColor, 1.0), gl_FragColor, v_visibility);
          }
     </script>
       <script id="terrainVertexShader" type="notJs">
@@ -86,23 +99,32 @@
         varying vec3 v_surfaceNormal;
         varying vec3 v_lightVector;
         varying vec3 v_toCameraVector;
+        varying float v_visibility;
         
         uniform mat4 u_transformationMatrix; 
         uniform mat4 u_projectionMatrix;
         uniform mat4 u_viewMatrix;
         uniform vec3 u_lightPosition;
         uniform mat4 u_inverseViewMatrix;
+
+        const float gradient = 1.5;
+        const float density = 0.007;
         
         
         void main() 
         {
             vec4 world = u_transformationMatrix * vec4(a_position,1.0);
-            gl_Position = u_projectionMatrix * u_viewMatrix * world;
+            vec4 positionRelativeToCam = u_viewMatrix * world;
+            gl_Position = u_projectionMatrix * positionRelativeToCam;
             v_texCoords = a_texCoords * 40.0; 
 
             v_surfaceNormal = (u_transformationMatrix * vec4(a_normals, 0.0)).xyz;
             v_lightVector = u_lightPosition - world.xyz;
             v_toCameraVector = (u_inverseViewMatrix * vec4(0.0,0.0,0.0,1.0)).xyz - world.xyz;
+
+            float distance = length(positionRelativeToCam.xyz);
+            v_visibility = exp(-pow(distance * density, gradient));
+            v_visibility = clamp(v_visibility, 0.0, 1.0);
         }
     </script>
     <script id="terrainFragmentShader" type="notJs">
@@ -111,11 +133,13 @@
          varying vec3 v_surfaceNormal;
          varying vec3 v_lightVector;
          varying vec3 v_toCameraVector;
+         varying float v_visibility;
          
          uniform vec3 u_lightColor;
          uniform sampler2D u_texture; 
          uniform float u_shineDamper;
          uniform float u_reflectivity;
+         uniform vec3 u_skyColor;
          
          void main()
          {
@@ -137,6 +161,7 @@
             
          
             gl_FragColor = vec4(diffuse, 1.0) *  texture2D(u_texture,v_texCoords) + vec4(finalSpecular, 1.0);
+            gl_FragColor = mix(vec4(u_skyColor, 1.0), gl_FragColor, v_visibility);
          }
     </script>
 </head>

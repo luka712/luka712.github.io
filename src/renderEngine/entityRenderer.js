@@ -14,12 +14,6 @@ function EntityRenderer(shader) {
 }
 
 EntityRenderer.prototype = {
-    prepare: function () {
-        GL.enable(GL.DEPTH_TEST);
-        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-         GL.clearColor(0.4, 0.8, 0.97, 1);
-
-    },
 
     // render: function (entity, shader) {
     //     var texturedModel = entity.texturedModel;
@@ -64,10 +58,10 @@ EntityRenderer.prototype = {
         var gl = GL;
 
 
-        if(texture.isTransparent){
+        if (texture.isTransparent) {
             MasterRenderer.disableBackCull();
         }
-        this.shader.loadShineVariables( texture.reflectivity, texture.damper);
+        this.shader.loadShineVariables(texture.reflectivity, texture.damper);
         this.shader.loadFakeLighting(texture.useFakeLight);
 
         gl.bindBuffer(b.pBuffer.type, b.pBuffer.buffer);

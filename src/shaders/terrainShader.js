@@ -6,9 +6,10 @@ function TerrainShader() {
     this.position_lightColor = null;
     this.position_reflectivity = null;
     this.position_shineDamper = null;
+    this.position_skyColor = null;
     this.attribLocations = [];
     ShaderProgram.call(this, "terrainVertexShader", "terrainFragmentShader");
-    
+
     this.inverseMatrix = null;
 }
 
@@ -30,6 +31,11 @@ TerrainShader.prototype.getAllUniformLocations = function () {
     this.position_reflectivity = this.getUniformLocation("u_reflectivity");
     this.position_shineDamper = this.getUniformLocation("u_shineDamper");
     this.position_inverseViewMatrix = this.getUniformLocation("u_inverseViewMatrix");
+    this.position_skyColor = this.getUniformLocation("u_skyColor");
+}
+
+TerrainShader.prototype.loadSkyColor = function (r, g, b) {
+    this.loadVector(this.position_skyColor, [r, g, b]);
 }
 
 TerrainShader.prototype.loadTransformationMatrix = function (value) {

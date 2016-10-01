@@ -7,6 +7,7 @@ function StaticShader() {
     this.position_reflectivity = null;
     this.position_shineDamper = null;
     this.position_fakeLighting = null;
+    this.position_skyColor = null;
     this.attribLocations = [];
     ShaderProgram.call(this, "vertexShader", "fragmentShader");
 
@@ -32,6 +33,11 @@ StaticShader.prototype.getAllUniformLocations = function () {
     this.position_shineDamper = this.getUniformLocation("u_shineDamper");
     this.position_inverseViewMatrix = this.getUniformLocation("u_inverseViewMatrix");
     this.position_fakeLighting = this.getUniformLocation("u_fakeLighting");
+    this.position_skyColor = this.getUniformLocation("u_skyColor");
+}
+
+StaticShader.prototype.loadSkyColor = function (r, g, b) {
+    this.loadVector(this.position_skyColor, [r, g, b]);
 }
 
 StaticShader.prototype.loadTransformationMatrix = function (value) {
@@ -58,7 +64,7 @@ StaticShader.prototype.loadShineVariables = function (reflectivity, damper) {
     this.loadFloat(this.position_shineDamper, damper);
 }
 
-StaticShader.prototype.loadFakeLighting = function(val){
+StaticShader.prototype.loadFakeLighting = function (val) {
     this.loadFloat(this.position_fakeLighting, val ? 1.0 : 0.0);
 }
 

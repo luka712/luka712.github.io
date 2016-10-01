@@ -16,12 +16,6 @@ function TerrainRenderer(shader) {
 }
 
 TerrainRenderer.prototype = {
-    prepare: function () {
-        GL.enable(GL.DEPTH_TEST);
-        GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
-        GL.clearColor(0.4, 0.8, 0.97, 1);
-    },
-
     loadModelMatrix: function (terrain) {
         var transformationMatrix = Maths.createTransformationMatrix(vec3.fromValues(terrain.x, 0, terrain.z), 0, 0, 0, 1);
         this.shader.loadTransformationMatrix(transformationMatrix);
