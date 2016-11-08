@@ -116,7 +116,7 @@
             vec4 world = u_transformationMatrix * vec4(a_position,1.0);
             vec4 positionRelativeToCam = u_viewMatrix * world;
             gl_Position = u_projectionMatrix * positionRelativeToCam;
-            v_texCoords = a_texCoords * 40.0; 
+            v_texCoords = a_texCoords; 
 
             v_surfaceNormal = (u_transformationMatrix * vec4(a_normals, 0.0)).xyz;
             v_lightVector = u_lightPosition - world.xyz;
@@ -136,13 +136,31 @@
          varying float v_visibility;
          
          uniform vec3 u_lightColor;
-         uniform sampler2D u_texture; 
          uniform float u_shineDamper;
          uniform float u_reflectivity;
          uniform vec3 u_skyColor;
+
+         uniform sampler2D u_backgroundTexture;
+         uniform sampler2D u_redTexture;
+         uniform sampler2D u_greenTexture;
+         uniform sampler2D u_blueTexture;
+         uniform sampler2D u_blendMapTexture;
          
          void main()
          {
+
+            vec4 blendMapColor = texture2D(u_blendMapTexture, v_texCoords);
+
+            float backTextureAmount = 1.0 - (blendMapColor.r + blendMapColor.g + blendMapColor.b);
+            vec2 tiledCoords = v_texCoords * 120.0;
+
+            vec4 backgroundTextureColor = texture2D(u_backgroundTexture, tiledCoords) * backTextureAmount;
+            vec4 redTexture = texture2D(u_redTexture,  tiledCoords) * blendMapColor.r;
+            vec4 greenTexture = texture2D(u_greenTexture,  tiledCoords) * blendMapColor.g;
+            vec4 blueTexture = texture2D(u_blueTexture,  tiledCoords) * blendMapColor.b;
+
+            vec4 totalColor = backgroundTextureColor + redTexture +  greenTexture + blueTexture;
+
             vec3 unitSurfaceNormal = normalize(v_surfaceNormal);
             vec3 unitLightVector = normalize(v_lightVector);
             vec3 unitToCameraVector = normalize(v_toCameraVector);
@@ -160,7 +178,7 @@
             vec3 finalSpecular = dampedFactor * u_lightColor * u_reflectivity;
             
          
-            gl_FragColor = vec4(diffuse, 1.0) *  texture2D(u_texture,v_texCoords) + vec4(finalSpecular, 1.0);
+            gl_FragColor = vec4(diffuse, 1.0) * totalColor + vec4(finalSpecular, 1.0);
             gl_FragColor = mix(vec4(u_skyColor, 1.0), gl_FragColor, v_visibility);
          }
     </script>
@@ -182,6 +200,8 @@
 <script src="src/shaders/terrainShader.js"></script>
 <script src="src/shaders/staticShader.js"></script>
 <script src="src/textures/modelTexture.js"></script>
+<script src="src/textures/terrainTexture.js"></script>
+<script src="src/textures/terrainTexturePack.js"></script>
 <script src="scripts/gl-matrix.js"></script>
 <script src="src/entities/entity.js"></script>
 <script src="src/toolbox/maths.js"></script>

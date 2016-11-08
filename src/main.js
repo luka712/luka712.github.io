@@ -44,9 +44,16 @@ function main() {
     camera = new Camera();
     light = new Light([0, 15.0, -30.0], [1.0, 1.0, 1.0]);
 
-    var grassTexture = new ModelTexture(loader.loadTexture("grass"));
-    terrain1 = new Terrain(0, 0, loader, grassTexture);
-    terrain2 = new Terrain(1, 0, loader, grassTexture);
+    var terrainBackgroundTexture = new TerrainTexture(loader.loadTexture("grassy"));
+    var redTexture = new TerrainTexture(loader.loadTexture("dirt"));
+    var greenTexture = new TerrainTexture(loader.loadTexture("pinkFlowers"));
+    var blueTexture = new TerrainTexture(loader.loadTexture("path"));
+
+    var terrainTexturePack = new TerrainTexturePack(terrainBackgroundTexture, redTexture, greenTexture, blueTexture);
+    var blendMapTexture = new TerrainTexture(loader.loadTexture("blendMap"))
+
+    terrain1 = new Terrain(0, 0, loader, terrainTexturePack, blendMapTexture);
+    terrain2 = new Terrain(1, 0, loader, terrainTexturePack, blendMapTexture);
     terrains = [terrain1, terrain2];
 
     loadModel('tree', 'tree', 3);

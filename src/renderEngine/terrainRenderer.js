@@ -11,6 +11,7 @@ function TerrainRenderer(shader) {
     GL.cullFace(GL.BACK);
     shader.start();
     shader.loadProjectionMatrix(projectionMatrix);
+    shader.connectTextureUnits();
     shader.stop();
 
 }
@@ -36,9 +37,9 @@ TerrainRenderer.prototype = {
         var gl = GL;
         var b = model.buffers;
 
-                this.shader.enableAttribs();
-        this.shader.loadShineVariables( texture.reflectivity, texture.damper);
-        
+        this.shader.enableAttribs();
+        this.shader.loadShineVariables(0.0, 1.0);
+
         gl.bindBuffer(b.pBuffer.type, b.pBuffer.buffer);
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
@@ -50,14 +51,24 @@ TerrainRenderer.prototype = {
 
         gl.bindBuffer(b.iBuffer.type, b.iBuffer.buffer);
 
-        GL.activeTexture(GL.TEXTURE0);
-        GL.bindTexture(GL.TEXTURE_2D, texture.textureId);
-        GL.activeTexture(GL.TEXTURE0);
-        GL.bindTexture(GL.TEXTURE_2D, texture.textureId);
+        this.bindTextures(terrain);
     },
 
     unbindTextureModel: function () {
         this.shader.disableAttribs();
         //GL.bindBuffer(GL.ARRAY_BUFFER, null);
+    },
+    bindTextures: function (terrain) {
+        var texturePack = terrain.texturePack;
+        GL.activeTexture(GL.TEXTURE0);
+        GL.bindTexture(GL.TEXTURE_2D, texturePack.backgroundTexture.textureId);
+        GL.activeTexture(GL.TEXTURE1);
+        GL.bindTexture(GL.TEXTURE_2D, texturePack.redTexture.textureId);
+        GL.activeTexture(GL.TEXTURE2);
+        GL.bindTexture(GL.TEXTURE_2D, texturePack.greenTexture.textureId);
+        GL.activeTexture(GL.TEXTURE3);
+        GL.bindTexture(GL.TEXTURE_2D, texturePack.blueTexture.textureId);
+        GL.activeTexture(GL.TEXTURE4);
+        GL.bindTexture(GL.TEXTURE_2D, terrain.blendMapTexture.textureId);
     }
 }

@@ -66,5 +66,8 @@ ShaderProgram.prototype = {
     },
     loadMatrix: function (location, value) {
         GL.uniformMatrix4fv(location, false, value);
+    },
+    loadInt: function(location, value){
+        GL.uniform1i(location, value);
     }
 }

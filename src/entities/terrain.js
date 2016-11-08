@@ -1,8 +1,9 @@
-function Terrain(gridx, gridz, loader, texture) {
+function Terrain(gridx, gridz, loader, texturePack, blendMapTexture) {
 
     this.SIZE = 800;
     this.VERTEX_COUNT = 8;
-    this.texture = texture;
+    this.texturePack = texturePack;
+    this.blendMapTexture = blendMapTexture;
     this.x = gridx * this.SIZE;
     this.z = gridz * this.SIZE;
     this.model = this.generateTerrain(loader);
