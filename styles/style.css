@@ -1,0 +1,9 @@
+#render-canvas{
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    background-color: cornflowerblue;
+}
+.header{
+    color:white;
+}
