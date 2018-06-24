@@ -191,7 +191,9 @@ function lerp(start, destination, amount) {
 function loadModels(terrainVertexData, scene, light) {
     BABYLON.SceneLoader.LoadAssetContainer("./", "../../../../models/PineTree.obj", scene, function (container) {
         var meshes = container.meshes;
+        debugger;
         var materials = createMaterials(scene);
+
         var pineTrunkMesh = meshes[0];
         var pineLeafMesh = meshes[1];
         pineTrunkMesh.material = materials.pineTrunk;
