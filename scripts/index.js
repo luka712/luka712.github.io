@@ -50,6 +50,8 @@ function createScene(engine, canvas) {
 
     loadModels(vertexData, scene, light);
 
+    postProcess(camera, canvas);
+
     return scene;
 }
 
@@ -186,6 +188,39 @@ function createFace(topLeft, bottomLeft, bottomRight, topRight, i) {
 
 function lerp(start, destination, amount) {
     return start + amount * (destination - start);
+}
+
+function postProcess(camera, canvas){
+    BABYLON.Effect.ShadersStore["customFragmentShader"] = `
+    #ifdef GL_ES
+        precision highp float;
+    #endif
+
+    // Samplers
+    varying vec2 vUV;
+    uniform sampler2D textureSampler;
+
+    // Parameters
+    uniform vec2 screenSize;
+
+    void main(void) 
+    {
+        vec2 gridSize = vec2(screenSize.x / 3.5, screenSize.y / 2.5);
+
+        float x =  floor(vUV.x * gridSize.x) / gridSize.x;
+        float y =  floor(vUV.y * gridSize.y) / gridSize.y;
+
+        vec4 baseColor = texture2D(textureSampler, vec2(x,y));
+
+        gl_FragColor = baseColor;
+ 
+    }
+    `;
+
+    var postProcess = new BABYLON.PostProcess("My custom post process", "custom", ["screenSize"], null, 1, camera);
+    postProcess.onApply = function (effect) {
+        effect.setFloat2("screenSize", canvas.width, canvas.height);
+    };
 }
 
 function loadModels(terrainVertexData, scene, light) {
