@@ -1,16 +1,20 @@
-
+var time = 0.0;
 function onLoad() {
 
     var canvas = setUpCanvas();
+    var postProcessEffect = null,
+        sceneInstrumentation = null;
+
 
     var engine = new BABYLON.Engine(canvas, true);
 
     var scene = createScene(engine, canvas);
     scene.clearColor = new BABYLON.Color3(0.39, 0.58, 0.93);
 
-    // engine.runRenderLoop(function () {
-    //     scene.render();
-    // });
+    engine.runRenderLoop(function () {
+
+        scene.render();
+    });
 
     window.addEventListener('resize', function () {
         setUpCanvas();
@@ -28,264 +32,132 @@ function createScene(engine, canvas) {
 
     camera.attachControl(canvas, false);
 
-    var light = new BABYLON.DirectionalLight('light1', new BABYLON.Vector3(-0.3, -1, 1), scene);
-    light.position = new BABYLON.Vector3(10, 10, -20);
+    sceneInstrumentation = new BABYLON.SceneInstrumentation(scene);
+    sceneInstrumentation.captureFrameTime = true;
 
-    var customMesh = new BABYLON.Mesh("custom", scene);
-    var material = new BABYLON.StandardMaterial("myMaterial", scene);
-    material.specularColor = new BABYLON.Color3(0, 0, 0);
-    customMesh.material = material;
-    customMesh.specularColor = new BABYLON.Color3(0, 0, 0);
-    customMesh.receiveShadows = true;
-    var terrainData = createTerrainData();
-    var vertexData = new BABYLON.VertexData();
-    var normals = [];
-    BABYLON.VertexData.ComputeNormals(terrainData.positions, terrainData.indices, normals);
-    vertexData.positions = terrainData.positions;
-    vertexData.indices = terrainData.indices;
-    vertexData.colors = terrainData.colors;
-    vertexData.normals = normals;
-
-    vertexData.applyToMesh(customMesh);
-
-    loadModels(vertexData, scene, light);
-
-    postProcess(camera, canvas);
+    postProcessEffect = postProcess(camera, canvas);
+    setUpCanvas();
+    postProcessEffect.onApply = function (effect) {
+        effect.setFloat2("screenSize", canvas.width, canvas.height);
+        effect.setFloat("time", time);
+        if(window.location.pathname === "/"){
+            time += 0.02;
+        }else{
+            time += 0.005;
+        }
+       
+    };
 
     return scene;
 }
 
-function createTerrainData() {
-    var i = 0;
-    var positions = [];
-    var indices = [];
-    for (var x = -15; x < 15; x++) {
-        for (var z = -30; z < 20; z++) {
-            var face = createFace([x, 0, z + 1], [x, 0, z], [x + 1, 0, z], [x + 1, 0, z + 1], i);
-            positions = positions.concat(face.verts);
-            indices = indices.concat(face.indices);
-            i = face.i;
-        }
-    }
 
-    var hills = [
-        new Hill(3, 20, 9, 10),
-        new Hill(-10, 20, 11, 12),
-        new Hill(15, 20, 5, 5),
-        new Hill(10, 10, 2, 10),
-        new Hill(8, 20, 15, 5)
-    ];
+function postProcess(camera, canvas) {
+    if(window.location.pathname === "/"){
+        BABYLON.Effect.ShadersStore["customFragmentShader"] = `
+        #ifdef GL_ES
+            precision highp float;
+        #endif
 
-    var green = [0.37, 0.7, 0.22, 1];
-    var brown = [0.6, 0.3, 0, 1];
-    var grey = [0.5, 0.5, 0.5];
-    var white = [1, 1, 1, 1];
+        // Samplers
+        varying vec2 vUV;
+        uniform sampler2D textureSampler;
 
-    var colors = [];
-    for (var i = 0; i <= positions.length; i += 3) {
-        var x = positions[i];
-        var y = positions[i + 1];
-        var z = positions[i + 2];
+        // Parameters
+        uniform vec2 screenSize;
+        uniform float time;
+        uniform float toneColor;
 
-        for (var j = 0; j < hills.length; j++) {
-            var hill = hills[j];
-            if (hill.height > y) {
-                var distance = Math.pow(x - hill.x, 2) + Math.pow(z - hill.z, 2);
-                if (distance <= hill.distSqr) {
-                    var newY = hill.height * (1 - distance / hill.distSqr);
-                    if (newY > hill.height) {
-                        newY = hill.height;
-                    }
-
-                    if (newY < positions[i + 1]) {
-                        continue;
-                    }
-
-                    positions[i + 1] = newY;
-                }
-            }
-        }
-    }
-
-    for (var i = 0; i <= positions.length; i += 9) {
-        var y1 = positions[i + 1];
-        var y2 = positions[i + 4];
-        var y3 = positions[i + 7];
-
-        var yAverage = (y1 + y2 + y3) / 3;
-
-        var color = green.slice();
-        if (yAverage > 0.5 && yAverage < 6) {
-            color = brown;
-        } else if (yAverage >= 6) {
-            color = white;
+        float Circle(vec2 uv, vec2 pos, float r){
+            float d = length(uv - pos);
+            return r / d;
         }
 
-        for (var j = 0; j < 3; j++) {
-            colors.push(color[0]);
-            colors.push(color[1]);
-            colors.push(color[2]);
-            colors.push(color[3]);
+        void main(void) 
+        {
+            vec2 uv = vUV;
+            uv -= .5;
+            uv.x *= screenSize.x / screenSize.y;
+
+
+            float r = .02;
+            float c = Circle(uv, vec2(sin(time * .66) * .25,  cos(time * .25) * .25), r);
+            c += Circle(uv, vec2(sin(time * .5) * .25, cos(time * .7) * .25), r);
+            c += Circle(uv, vec2(sin(time * .7) * .25, cos(time * .8) * .25), r);
+            c += Circle(uv, vec2(sin(time * .2) * .25, cos(time * .3) * .25), r);
+            c += Circle(uv, vec2(sin(time * .3) * .25, cos(time * .4) * .25), r);
+            c += Circle(uv, vec2(sin(time * .6) * .25, cos(time * .6) * .25), r);
+            c += Circle(uv, vec2(sin(time * .5) * .25, cos(time * .2) * .25), r);
+            c += Circle(uv, vec2(sin(time * .3) * .25, cos(time * .6) * .25), r);
+            c += Circle(uv, vec2(sin(time * .7) * .25, cos(time * .3) * .25), r);
+            c += Circle(uv, vec2(sin(time * .9) * .25, cos(time * .1) * .25), r);
+
+            gl_FragColor = vec4(vec3(-.5), 1.)  + vec4(.25 * c, 0.5 * c, 1., .1) * c;
+    
         }
-    }
+        `;
+    }else{
+        BABYLON.Effect.ShadersStore["customFragmentShader"] = `
+        #ifdef GL_ES
+            precision highp float;
+        #endif
 
-    return {
-        positions: positions,
-        indices: indices,
-        colors: colors
-    }
-}
+        // Samplers
+        varying vec2 vUV;
+        uniform sampler2D textureSampler;
 
-function createMaterials(scene) {
+        // Parameters
+        uniform vec2 screenSize;
+        uniform float time;
+        uniform float toneColor;
 
-    var leafeMaterial = new BABYLON.StandardMaterial("pineTrunkMaterial", scene);
-    leafeMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.3, 0.3);
-
-    var trunkMaterial = new BABYLON.StandardMaterial("pineLeafeMaterial", scene);
-    trunkMaterial.diffuseColor = new BABYLON.Color3(0, 1, 0);
-
-    return {
-        pineTrunk: trunkMaterial,
-        pineLeafes: leafeMaterial
-    }
-}
-
-function Hill(x, z, height, distance) {
-    this.x = x;
-    this.z = z;
-    this.height = height;
-    this.distance = distance;
-    this.distSqr = distance * distance;
-}
-
-function TreeZone(minX, maxX, minZ, maxZ, amount) {
-    this.minX = minX;
-    this.maxX = maxX;
-    this.minZ = minZ;
-    this.maxZ = maxZ;
-    this.amount = amount;
-}
-
-function createFace(topLeft, bottomLeft, bottomRight, topRight, i) {
-
-    var v1 = topLeft;
-    var v2 = bottomLeft;
-    var v3 = bottomRight;
-    var v4 = bottomRight;
-    var v5 = topRight;
-    var v6 = topLeft;
-
-    var indices = [i++, i++, i++, i++, i++, i++];
-    var c = [0, 1, 0, 1];
-
-    return {
-        verts: v1.concat(v2, v3, v4, v5, v6),
-        indices: indices,
-        colors: c.concat(c, c, c, c, c),
-        i: i
-    }
-}
-
-function lerp(start, destination, amount) {
-    return start + amount * (destination - start);
-}
-
-function postProcess(camera, canvas){
-    BABYLON.Effect.ShadersStore["customFragmentShader"] = `
-    #ifdef GL_ES
-        precision highp float;
-    #endif
-
-    // Samplers
-    varying vec2 vUV;
-    uniform sampler2D textureSampler;
-
-    // Parameters
-    uniform vec2 screenSize;
-
-    void main(void) 
-    {
-        vec2 gridSize = vec2(screenSize.x / 3.5, screenSize.y / 2.5);
-
-        float x =  floor(vUV.x * gridSize.x) / gridSize.x;
-        float y =  floor(vUV.y * gridSize.y) / gridSize.y;
-
-        vec4 baseColor = texture2D(textureSampler, vec2(x,y));
-
-        gl_FragColor = baseColor;
- 
-    }
-    `;
-
-    var postProcess = new BABYLON.PostProcess("My custom post process", "custom", ["screenSize"], null, 1, camera);
-    postProcess.onApply = function (effect) {
-        effect.setFloat2("screenSize", canvas.width, canvas.height);
-    };
-}
-
-function loadModels(terrainVertexData, scene, light) {
-    BABYLON.SceneLoader.LoadAssetContainer("./", "../../../../models/PineTree.obj", scene, function (container) {
-        var meshes = container.meshes;
-        debugger;
-        var materials = createMaterials(scene);
-
-        var pineTrunkMesh = meshes[0];
-        var pineLeafMesh = meshes[1];
-        pineTrunkMesh.material = materials.pineTrunk;
-        pineLeafMesh.material = materials.pineLeafes;
-
-        var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-
-        var treeZones = [
-            // middle
-            new TreeZone(-15, 15, -5, 5, 0.05),
-            // hills
-            new TreeZone(-15, 15, 5, 11, 0.02),
-            // close to camera
-            new TreeZone(-15, 15, -23, 5, 0.05),
-
-        ];
-
-        for (var i = 0; i < terrainVertexData.positions.length; i += 9) {
-
-            for (var j = 0; j < treeZones.length; j++) {
-
-                var v1 = new BABYLON.Vector3(terrainVertexData.positions[i], terrainVertexData.positions[i + 1], terrainVertexData.positions[i + 2]);
-                var v2 = new BABYLON.Vector3(terrainVertexData.positions[i + 3], terrainVertexData.positions[i + 4], terrainVertexData.positions[i + 5]);
-                var v3 = new BABYLON.Vector3(terrainVertexData.positions[i + 6], terrainVertexData.positions[i + 7], terrainVertexData.positions[i + 8]);
-                if (v1.x >= treeZones[j].minX && v1.x <= treeZones[j].maxX && v1.z >= treeZones[j].minZ && v1.z <= treeZones[j].maxZ) {
-
-                    var shouldCreate = Math.random();
-                    if (shouldCreate >= treeZones[j].amount) {
-                        continue;
-                    }
-                    var x = ((v1.x + v2.x + v3.x) / 3) - 0.5 + Math.random();
-                    var y = (v1.y + v2.y + v3.y) / 3;
-                    var z = ((v1.z + v2.z + v3.z) / 3) - 0.5 + Math.random();
-                    var pine = new BABYLON.TransformNode("pine" + i + "zone" + j);
-                    var trunk = pineTrunkMesh.createInstance("pineTrunkMeshInstance" + i + "zone" + j);
-                    var leafes = pineLeafMesh.createInstance("pineLeafMeshInstance" + i + "zone" + j);
-                    shadowGenerator.getShadowMap().renderList.push(trunk);
-                    shadowGenerator.getShadowMap().renderList.push(leafes);
-                    trunk.parent = pine;
-                    leafes.parent = pine;
-                    var scale = Math.random() * 0.3 - 0.15;
-                    pine.scaling = new BABYLON.Vector3(0.5 + scale, 0.5 + scale, 0.5 + scale);
-                    pine.position = new BABYLON.Vector3(x, y + scale, z);
-                    pine.rotation.y = Math.random() * Math.PI;
-                }
-            }
+        float Circle(vec2 uv, vec2 pos, float r){
+            float d = length(uv - pos - vec2(-.25, .25));
+            return r / d;
         }
-        scene.render();
-    });
 
+        void main(void) 
+        {
+            vec2 uv = vUV;
+            uv -= .5;
+            uv.x *= screenSize.x / screenSize.y;
+
+
+            float r = .005;
+            float c = Circle(uv, vec2(sin(time * 2.) * .1,  sin(time * .4) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.5) * .1, sin(time * -.7) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.7) * .1, sin(time * .8) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.2) * .1, sin(time * -.3) * .1), r);
+            c += Circle(uv, vec2(sin(time * .3) * .1, sin(time * .4) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.6) * .1, sin(time * -.6) * .1), r);
+            c += Circle(uv, vec2(sin(time * .5) * .1, sin(time * .2) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.3) * .1, sin(time * -.6) * .1), r);
+            c += Circle(uv, vec2(sin(time * .7) * .1, sin(time * .3) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.2) * .1, sin(-time) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.5) * .1, sin(time * -.51) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.3) * .1, sin(time * .2) * .1), r);
+            c += Circle(uv, vec2(sin(time * .3) * .1, sin(time * .4) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.6) * .1, sin(time * -.5) * .1), r);
+            c += Circle(uv, vec2(sin(time * -.3) * .1, sin(time * .52) * .1), r);
+            c += Circle(uv, vec2(sin(time * .6) * .1, sin(time * -.3) * .1), r);
+            c += Circle(uv, vec2(sin(time * .76) * .1, sin(time * -.3) * .1), r);
+            c += Circle(uv, vec2(sin(time * .96) * .1, sin(-time * .2) * .1), r);
+
+           
+            gl_FragColor = vec4(vec3(1., 0.5, 0.5) * c * .2, 1.);
+    
+        }
+        `;
+    }
+
+    return new BABYLON.PostProcess("My custom post process", "custom", ["screenSize", "time", "toneColor"], null, 1, camera);
 }
 
 function setUpCanvas() {
 
     var header = $('header');
     var canvas = document.getElementById('render-canvas');
-    canvas.width =  header.outerWidth();
+    canvas.width = header.outerWidth();
     canvas.height = header.outerHeight();
 
     return canvas;
