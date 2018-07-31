@@ -9,10 +9,10 @@ function onLoad() {
     var engine = new BABYLON.Engine(canvas, true);
 
     var scene = createScene(engine, canvas);
-    scene.clearColor = new BABYLON.Color3(0.39, 0.58, 0.93);
+    scene.clearColor = new BABYLON.Color3(0., 0, 0.);
 
     engine.runRenderLoop(function () {
-
+        scene.clearColor = new BABYLON.Color3(0., 0, 0.);
         scene.render();
     });
 
@@ -121,38 +121,30 @@ function postProcess(camera, canvas) {
             return fract(sin(dot(vec2(100., 522.), uv)) * 51251.);
         }
 
+        float mask(vec2 uv){
+            uv -= .5;
+            float d = length(uv - vec2(.5,0.2));
+            return  1. / d;
+        }
+
         void main(void) 
         {
-            vec2 uv = vUV;
-            uv -= .5;
-            uv.x *= screenSize.x / screenSize.y;
-
-            // metaballs
-            float r = .02;
-            float c = Circle(uv, vec2(sin(time * .66) * .25,  cos(time * .25) * .25), r);
-            c += Circle(uv, vec2(sin(time * .5) * .25, cos(time * .7) * .25), r);
-            c += Circle(uv, vec2(sin(time * .7) * .25, cos(time * .8) * .25), r);
-            c += Circle(uv, vec2(sin(time * .2) * .25, cos(time * .3) * .25), r);
-            c += Circle(uv, vec2(sin(time * .3) * .25, cos(time * .4) * .25), r);
-            c += Circle(uv, vec2(sin(time * .6) * .25, cos(time * .6) * .25), r);
-            c += Circle(uv, vec2(sin(time * .5) * .25, cos(time * .2) * .25), r);
-            c += Circle(uv, vec2(sin(time * .3) * .25, cos(time * .6) * .25), r);
-            c += Circle(uv, vec2(sin(time * .7) * .25, cos(time * .3) * .25), r);
-            c += Circle(uv, vec2(sin(time * .9) * .25, cos(time * .1) * .25), r);
 
             // voronoi
-            uv = vUv;
+           vec2 uv = vUV;
             uv.x *= screenSize.x / screenSize.y;
+            float m = mask(uv);
+            uv *= 10.;
 
             vec2 i = floor(uv);
-            vec2 f = fract(uv);
+            vec2 f = fract(uv) - .5;
 
-            float minDist = 1.;
-            for(float x = -1.; x <= 1.; x++){
-                for(float y = -1.; y <= 1.; y++){
+            float minDist = 1.1;
+            for(float y = -1.; y <= 1.; y++){
+                for(float x = -1.; x <= 1.; x++){
                     vec2 o = vec2(x,y);
-                    vec2 rv = vec2(random(i.x + o.x), random(i.y + o.y));
-                    vec2 p = o + sin(rv * time) * 0.5;
+                    vec2 rv = vec2(random(i + o), random( i+ o));
+                    vec2 p = o + sin(rv * time + 0.5) * 0.5;
 
                     float d = length(f - p);
                     if(d < minDist){
@@ -161,7 +153,25 @@ function postProcess(camera, canvas) {
                 }
             }
 
-            gl_FragColor = vec4(1., 0.05, 0.05, 1.) * minDist * c;
+            vec3 vorCol  =  vec3(.5, 0.75, 1.5) *  minDist;
+
+            // metaballs
+            uv = vUV;
+            uv -= .5;
+            uv.y += .4;
+            uv.x += .4;
+            uv.x *= screenSize.x / screenSize.y;
+
+            float r = .05;
+            float c = Circle(uv, vec2(0.2 + sin(time * 2.66) *  .2,  cos(time * 1.25)), r);
+            c += Circle(uv, vec2(sin(time * 2.5) * .2, cos(time * 1.7)), r);
+            c += Circle(uv, vec2(cos(time * 2.7) * .2, sin(time * 1.8)), r);
+            c += Circle(uv, vec2(sin(time * 2.2) * .2, cos(time * 1.3)), r);
+            c += Circle(uv, vec2(cos(time * 2.3) * .2, sin(time * 1.4)), r);
+
+          
+            vec4 col = vec4(vorCol,1.) * c * 2.5;
+            gl_FragColor = col * (1. - m * 0.5);
     
         }
         `;
@@ -176,6 +186,8 @@ function setUpCanvas() {
     var canvas = document.getElementById('render-canvas');
     canvas.width = header.outerWidth();
     canvas.height = header.outerHeight();
+    $(canvas).css('position', 'absolute');
+    $(canvas).css('background-color', 'black');
 
     return canvas;
 }
