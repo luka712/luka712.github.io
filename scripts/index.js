@@ -102,6 +102,7 @@ function postProcess(camera, canvas) {
             precision highp float;
         #endif
 
+      
         // Samplers
         varying vec2 vUV;
         uniform sampler2D textureSampler;
@@ -112,8 +113,12 @@ function postProcess(camera, canvas) {
         uniform float toneColor;
 
         float Circle(vec2 uv, vec2 pos, float r){
-            float d = length(uv - pos - vec2(-.25, .25));
+            float d = length(uv - pos);
             return r / d;
+        }
+
+        float random(vec2 uv){
+            return fract(sin(dot(vec2(100., 522.), uv)) * 51251.);
         }
 
         void main(void) 
@@ -122,29 +127,41 @@ function postProcess(camera, canvas) {
             uv -= .5;
             uv.x *= screenSize.x / screenSize.y;
 
+            // metaballs
+            float r = .02;
+            float c = Circle(uv, vec2(sin(time * .66) * .25,  cos(time * .25) * .25), r);
+            c += Circle(uv, vec2(sin(time * .5) * .25, cos(time * .7) * .25), r);
+            c += Circle(uv, vec2(sin(time * .7) * .25, cos(time * .8) * .25), r);
+            c += Circle(uv, vec2(sin(time * .2) * .25, cos(time * .3) * .25), r);
+            c += Circle(uv, vec2(sin(time * .3) * .25, cos(time * .4) * .25), r);
+            c += Circle(uv, vec2(sin(time * .6) * .25, cos(time * .6) * .25), r);
+            c += Circle(uv, vec2(sin(time * .5) * .25, cos(time * .2) * .25), r);
+            c += Circle(uv, vec2(sin(time * .3) * .25, cos(time * .6) * .25), r);
+            c += Circle(uv, vec2(sin(time * .7) * .25, cos(time * .3) * .25), r);
+            c += Circle(uv, vec2(sin(time * .9) * .25, cos(time * .1) * .25), r);
 
-            float r = .005;
-            float c = Circle(uv, vec2(sin(time * 2.) * .1,  sin(time * .4) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.5) * .1, sin(time * -.7) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.7) * .1, sin(time * .8) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.2) * .1, sin(time * -.3) * .1), r);
-            c += Circle(uv, vec2(sin(time * .3) * .1, sin(time * .4) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.6) * .1, sin(time * -.6) * .1), r);
-            c += Circle(uv, vec2(sin(time * .5) * .1, sin(time * .2) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.3) * .1, sin(time * -.6) * .1), r);
-            c += Circle(uv, vec2(sin(time * .7) * .1, sin(time * .3) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.2) * .1, sin(-time) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.5) * .1, sin(time * -.51) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.3) * .1, sin(time * .2) * .1), r);
-            c += Circle(uv, vec2(sin(time * .3) * .1, sin(time * .4) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.6) * .1, sin(time * -.5) * .1), r);
-            c += Circle(uv, vec2(sin(time * -.3) * .1, sin(time * .52) * .1), r);
-            c += Circle(uv, vec2(sin(time * .6) * .1, sin(time * -.3) * .1), r);
-            c += Circle(uv, vec2(sin(time * .76) * .1, sin(time * -.3) * .1), r);
-            c += Circle(uv, vec2(sin(time * .96) * .1, sin(-time * .2) * .1), r);
+            // voronoi
+            uv = vUv;
+            uv.x *= screenSize.x / screenSize.y;
 
-           
-            gl_FragColor = vec4(vec3(1., 0.5, 0.5) * c * .2, 1.);
+            vec2 i = floor(uv);
+            vec2 f = fract(uv);
+
+            float minDist = 1.;
+            for(float x = -1.; x <= 1.; x++){
+                for(float y = -1.; y <= 1.; y++){
+                    vec2 o = vec2(x,y);
+                    vec2 rv = vec2(random(i.x + o.x), random(i.y + o.y));
+                    vec2 p = o + sin(rv * time) * 0.5;
+
+                    float d = length(f - p);
+                    if(d < minDist){
+                        minDist = d;
+                    }
+                }
+            }
+
+            gl_FragColor = vec4(1., 0.05, 0.05, 1.) * minDist * c;
     
         }
         `;
