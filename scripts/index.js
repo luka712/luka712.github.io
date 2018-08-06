@@ -1,4 +1,4 @@
-var time = 0.0;
+var time = 3.0;
 function onLoad() {
 
     var canvas = setUpCanvas();
@@ -123,7 +123,7 @@ function postProcess(camera, canvas) {
 
         float mask(vec2 uv){
             uv -= .5;
-            float d = length(uv - vec2(.5,0.2));
+            float d = length(uv - vec2(.45,0.2));
             return  1. / d;
         }
 
@@ -134,7 +134,7 @@ function postProcess(camera, canvas) {
            vec2 uv = vUV;
             uv.x *= screenSize.x / screenSize.y;
             float m = mask(uv);
-            uv *= 10.;
+            uv *= 15.;
 
             vec2 i = floor(uv);
             vec2 f = fract(uv) - .5;
@@ -153,7 +153,7 @@ function postProcess(camera, canvas) {
                 }
             }
 
-            vec3 vorCol  =  vec3(.5, 0.75, 1.5) *  minDist;
+            vec3 vorCol  =  vec3(.6, 0.85, 1.75) *  minDist;
 
             // metaballs
             uv = vUV;
@@ -163,14 +163,9 @@ function postProcess(camera, canvas) {
             uv.x *= screenSize.x / screenSize.y;
 
             float r = .05;
-            float c = Circle(uv, vec2(0.2 + sin(time * 2.66) *  .2,  cos(time * 1.25)), r);
-            c += Circle(uv, vec2(sin(time * 2.5) * .2, cos(time * 1.7)), r);
-            c += Circle(uv, vec2(cos(time * 2.7) * .2, sin(time * 1.8)), r);
-            c += Circle(uv, vec2(sin(time * 2.2) * .2, cos(time * 1.3)), r);
-            c += Circle(uv, vec2(cos(time * 2.3) * .2, sin(time * 1.4)), r);
 
           
-            vec4 col = vec4(vorCol,1.) * c * 2.5;
+            vec4 col = vec4(vorCol,1.);
             gl_FragColor = col * (1. - m * 0.5);
     
         }
