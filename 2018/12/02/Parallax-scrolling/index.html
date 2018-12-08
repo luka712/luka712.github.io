@@ -1,0 +1,381 @@
+<!DOCTYPE html><html lang="en-us"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><title>Parallax scrolling | luka712 blog</title><meta name="description"><meta name="generator" content="luka712 blog"><meta name="author" content="Luka Erkapic"><meta name="keywords" content="sjaak van den berg, svdb, bitcoin, crypto, payment, integration, bitcoins, wordpress, betaling, webshop, front end, design, ontwerp, developer"><meta name="HandheldFriendly" content="True"><meta name="MobileOptimized" content="320"><meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=0"><link rel="stylesheet" type="text/css" href="/styles/screen.css"><link rel="stylesheet" type="text/css" href="/styles/style.css"><link rel="apple-touch-icon" sizes="57x57" href="/images/apple-touch-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/images/apple-touch-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/images/apple-touch-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/images/apple-touch-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/images/apple-touch-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/images/apple-touch-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/images/apple-touch-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-180x180.png"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/images/favicon-96x96.png"><link rel="icon" type="image/png" sizes="160x160" href="/images/favicon-160x160.png"><link rel="icon" type="image/png" sizes="192x192" href="/images/favicon-192x192.png"><meta name="msapplication-TileColor" content="#121315"><meta name="msapplication-TileImage" content="/images/mstile-144x144.png"></head><body itemscope itemtype="https://schema.org/WebPage" onload="onLoad()"><header itemscope itemtype="https://schema.org/WPHeader"><h1><a href="/" alt="luka712 blog" title="luka712 blog" itemprop="headline" class="header">luka712 blog</a></h1><p itemprop="description"></p><nav itemscope itemtype="https://schema.org/SiteNavigationElement"><ul><li itemprop="name"><a href="/" alt="Home" title="Home" itemprop="url" class="header">Home</a></li><li itemprop="name"><a href="/About" alt="About" title="About" itemprop="url" class="header">About</a></li></ul></nav><div id="render-space"><canvas id="render-canvas"></canvas></div></header><main itemscope itemtype="https://schema.org/Blog"><article class="full"><h1 itemprop="headline">Parallax scrolling</h1><span class="post-meta">Published on<time itemprop="datePublished" datetime="2018-12-02T07:51:31.000Z"> Sunday, December 2nd 2018 at 8:51</time><br>Last updated on<time itemprop="dateModified" datetime="2018-12-02T07:51:31.000Z"> Saturday, December 8th 2018 at 23:29</time></span><h5 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h5><p>This is one of simpler posts, it is hour of code week after all. I will be using new JavaScript features, so I do recommend updating browser to follow examples. I was thinking about writing older JavaScript, but it might be confusing, since new features like classes make it so much easier to follow for non JavaScript developers.</p>
+<p>Some basics are required, like knowing how to create simple html page with canvas element. There are plenty of sites like <a href="https://www.codecademy.com/learn" target="_blank" rel="noopener">CodeAcademy</a> that provide some basic introduction courses, often going even furher then that.</p>
+<h5 id="Parallax-scrolling"><a href="#Parallax-scrolling" class="headerlink" title="Parallax scrolling"></a>Parallax scrolling</h5><p>In terms of this post, <strong>parallax scrolling</strong> will be explained on background example. Parallax scrolling simply achieves illusion of depth, by moving things in background slower and things in foreground faster. “Things” in this post will be simple images of city.</p>
+<p>For this example I took this free assets from <a href="https://opengameart.org/content/city-parallax-pixel-art" target="_blank" rel="noopener">OpenGameArt</a>, feel free to download them if you’re going to follow this example.</p>
+<p>Either way we are going to try to get this </p>
+
+
+    <canvas id="parallax-scrolling-canvas" style="width:50%"></canvas>
+    <script>
+    'use strict';
+    var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+    function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+    var ScrollingSprite = function () {
+        function ScrollingSprite(image, x, y, width, height, speed) {
+            _classCallCheck(this, ScrollingSprite);
+            this.image = image;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.speed = speed;
+        }
+        _createClass(ScrollingSprite, [{
+            key: 'scroll',
+            value: function scroll() {
+                this.x -= this.speed;
+                if (this.x <= -this.width) {
+                    this.x = this.width - 1;
+                }
+            }
+        }, {
+            key: 'draw',
+            value: function draw(ctx) {
+                ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            }
+        }]);
+        return ScrollingSprite;
+    }();
+    window.example1 = function () {
+        var canvas = document.getElementById("parallax-scrolling-canvas");
+        var ctx = canvas.getContext('2d');
+        var backgroundImage = new Image();
+        backgroundImage.src = '/images/11/BG.png';
+        var backgroudSprite = new ScrollingSprite(backgroundImage, 0, 0, canvas.width, canvas.height, 1);
+        var backgroundSprite2 = new ScrollingSprite(backgroundImage, -canvas.width, 0, canvas.width, canvas.height, 1);
+        var bakcgroundBuildingsImage = new Image();
+        bakcgroundBuildingsImage.src = '/images/11/Background 1.png';
+        var backgroundBuildingsSprite = new ScrollingSprite(bakcgroundBuildingsImage, 0, 0, canvas.width, canvas.height, 2);
+        var backgroundBuildingsSprite2 = new ScrollingSprite(bakcgroundBuildingsImage, -canvas.width, 0, canvas.width, canvas.height);
+        var bridgeImage = new Image();
+        bridgeImage.src = '/images/11/Middle.png';
+        var middleSprite = new ScrollingSprite(bridgeImage, 0, 0, canvas.width, canvas.height, 2.5);
+        var middleSprite2 = new ScrollingSprite(bridgeImage, -canvas.width, 0, canvas.width, canvas.height, 2.5);
+        var foregroundBuildingImage = new Image();
+        foregroundBuildingImage.src = '/images/11/Foreground.png';
+        var foregroundBuildingSprite = new ScrollingSprite(foregroundBuildingImage, 0, 0, canvas.width, canvas.height, 3);
+        var foregroundBuildingSprite2 = new ScrollingSprite(foregroundBuildingImage, -canvas.width, 0, canvas.width, canvas.height, 3);
+        var spriteArray = [backgroudSprite, backgroundSprite2, backgroundBuildingsSprite, backgroundBuildingsSprite2, middleSprite, middleSprite2, foregroundBuildingSprite, foregroundBuildingSprite2];
+        var render = function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spriteArray.forEach(function(sprite){
+                sprite.scroll();
+                sprite.draw(ctx);
+            });
+            window.requestAnimationFrame(render);
+        }
+        render();
+    };
+    </script>
+    
+
+<p>With these 4 images.</p>
+<p><img src="/images/11/BG.png" style="width:50%"></p>
+<p><img src="/images/11/Background 1.png" style="width:50%"></p>
+<p><img src="/images/11/Middle.png" style="width:50%"></p>
+<p><img src="/images/11/Foreground.png" style="width:50%"></p>
+<p>For start I have created simple html page. I have named mine <em>index.html</em>.</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>Parallax scrolling<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">canvas</span> <span class="attr">id</span>=<span class="string">"render-canvas"</span> <span class="attr">width</span>=<span class="string">"960"</span> <span class="attr">height</span>=<span class="string">"540"</span>&gt;</span><span class="tag">&lt;/<span class="name">canvas</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"main.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Notice <em>width</em> of 960 and <em>height</em> of 540 attributes on canvas element. Assets that I’m using are of size 240x135, which when multipled by 4 give 960x540. I’m doing that mainly to keep pixels nicely aligned.</p>
+<p>I have also created <em>main.js</em> file. So add that as well</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>window.onload</em> is simple event that fires off when browser has loaded and is ready, for those of you who never worked with JS.</p>
+<p>After unpacking background file, I have created <em>assets</em> folder and placed all the images there.<br>My folder structure is as follows if you plan to follow with code.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">+-- assets</span><br><span class="line">|   +-- Background 1.png</span><br><span class="line">|   +-- BG.png</span><br><span class="line">|   +-- Foreground.png</span><br><span class="line">|   +-- Middle.png</span><br><span class="line">+-- index.html</span><br><span class="line">+-- main.js</span><br></pre></td></tr></table></figure>
+<p>For start, we need to create drawing context. I’m going to use <a href="https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D" target="_blank" rel="noopener">2d</a> drawing context of canvas element.<br>If you’re wondering what <em>canvas</em> is, it is just drawing surface in html. Usually simple graphics can be done with <em>2d</em> context, for 3d graphics there is <em>webgl</em> context.</p>
+<p>So let’s get reference to canvas and initalize the context. Following code goes inside onload function.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">"render-canvas"</span>);</span><br><span class="line"><span class="keyword">const</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br></pre></td></tr></table></figure>
+<p>After that we need drawing loop, which will simply draw something to surface as time goes by.<br>Usually it will be called 60 times in a second, meaning it runs in 60fps.</p>
+<p>Add render(draw) function:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> render = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// Clear surface every frame.</span></span><br><span class="line">  <span class="comment">// Simply prepares surface for new draw and removes content from old draw.</span></span><br><span class="line">  ctx.clearRect(<span class="number">0</span>,<span class="number">0</span>,canvas.width, canvas.height);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Request animation frame, will call loop again.</span></span><br><span class="line">  <span class="built_in">window</span>.requestAnimationFrame(render); </span><br><span class="line">&#125;</span><br><span class="line">render();</span><br></pre></td></tr></table></figure>
+<p>Without the code comments you should now have the following code</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">"render-canvas"</span>);</span><br><span class="line">    <span class="keyword">const</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> render = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        ctx.clearRect(<span class="number">0</span>,<span class="number">0</span>,canvas.width, canvas.height);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">window</span>.requestAnimationFrame(render);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    render();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Next step would be to to add and start moving images. That’s the <em>scrolling</em> part.</p>
+<p>We actually want to achieve this</p>
+
+
+    <canvas id="parallax-scrolling-canvas-2" style="width:50%"></canvas>
+    <script>
+    'use strict';
+    var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+    function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+    var ScrollingSprite = function () {
+        function ScrollingSprite(image, x, y, width, height, speed) {
+            _classCallCheck(this, ScrollingSprite);
+            this.image = image;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.speed = speed;
+        }
+        _createClass(ScrollingSprite, [{
+            key: 'scroll',
+            value: function scroll() {
+                this.x -= this.speed;
+                if (this.x <= -this.width) {
+                    this.x = this.width - 1;
+                }
+            }
+        }, {
+            key: 'draw',
+            value: function draw(ctx) {
+                ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            }
+        }]);
+        return ScrollingSprite;
+    }();
+    window.example2 = function () {
+        var canvas = document.getElementById("parallax-scrolling-canvas-2");
+        var ctx = canvas.getContext('2d');
+        var backgroundImage = new Image();
+        backgroundImage.src = '/images/11/BG.png';
+        var backgroudSprite = new ScrollingSprite(backgroundImage, 0, 0, canvas.width, canvas.height, 1);
+        var backgroundSprite2 = new ScrollingSprite(backgroundImage, -canvas.width, 0, canvas.width, canvas.height, 1);
+        var bakcgroundBuildingsImage = new Image();
+        bakcgroundBuildingsImage.src = '/images/11/Background 1.png';
+        var backgroundBuildingsSprite = new ScrollingSprite(bakcgroundBuildingsImage, 0, 0, canvas.width, canvas.height, 2);
+        var backgroundBuildingsSprite2 = new ScrollingSprite(bakcgroundBuildingsImage, -canvas.width, 0, canvas.width, canvas.height);
+        var bridgeImage = new Image();
+        bridgeImage.src = '/images/11/Middle.png';
+        var middleSprite = new ScrollingSprite(bridgeImage, 0, 0, canvas.width, canvas.height, 2.5);
+        var middleSprite2 = new ScrollingSprite(bridgeImage, -canvas.width, 0, canvas.width, canvas.height, 2.5);
+        var foregroundBuildingImage = new Image();
+        foregroundBuildingImage.src = '/images/11/Foreground.png';
+        var foregroundBuildingSprite = new ScrollingSprite(foregroundBuildingImage, 0, 0, canvas.width, canvas.height, 3);
+        var foregroundBuildingSprite2 = new ScrollingSprite(foregroundBuildingImage, -canvas.width, 0, canvas.width, canvas.height, 3);
+        var spriteArray = [backgroudSprite, backgroundSprite2];
+        var render = function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spriteArray.forEach(function(sprite){
+                sprite.scroll();
+                sprite.draw(ctx);
+            });
+            window.requestAnimationFrame(render);
+        }
+        render();
+    };
+    </script>
+    
+
+<p>Add background image, this is done right after ctx call</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> backgroundImage = <span class="keyword">new</span> Image();</span><br><span class="line">backgroundImage.src = <span class="string">'./assets/BG.png'</span>;</span><br><span class="line">backgroundImage.position = &#123; <span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">0</span>&#125;;</span><br></pre></td></tr></table></figure>
+<p>And change render loop to this</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ctx.clearRect(<span class="number">0</span>,<span class="number">0</span>,canvas.width, canvas.height);</span><br><span class="line"></span><br><span class="line">ctx.drawImage(backgroundImage, backgroundImage.position.x, backgroundImage.position.y, canvas.width, canvas.height);</span><br><span class="line">backgroundImage.position.x -= <span class="number">0.1</span>;</span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.requestAnimationFrame(render);</span><br></pre></td></tr></table></figure>
+<p>If you run your code, you should get something like this.Also click to reset image if it’s not visible.</p>
+
+<canvas id="parallax-scrolling-canvas-3" style="width:50%"></canvas>
+    <script>
+    window.example3 = function () {
+        var canvas = document.getElementById("parallax-scrolling-canvas-3");
+        var ctx = canvas.getContext('2d');
+        var backgroundImage = new Image();
+        backgroundImage.src = '/images/11/BG.png';
+          backgroundImage.position = {x: 0, y: 0}
+        window.onclick= function(){
+            backgroundImage.position.x = 0;
+        }
+        var render = function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+             ctx.drawImage(backgroundImage, backgroundImage.position.x, backgroundImage.position.y, canvas.width, canvas.height);
+            backgroundImage.position.x -= 1;
+            window.requestAnimationFrame(render);
+        }
+        render();
+    };
+    </script>
+
+<p>And that is great, there is some movement and that fine, but what we really want is for it to seem like it’s moving all the time and for that we need 2 things.</p>
+<p><em>One of them is to reset image once it leaves the screen.</em></p>
+
+<canvas id="parallax-scrolling-canvas-4" style="width:50%"></canvas>
+    <script>
+    window.example4 = function () {
+        var canvas = document.getElementById("parallax-scrolling-canvas-4");
+        var ctx = canvas.getContext('2d');
+        var backgroundImage = new Image();
+        backgroundImage.src = '/images/11/BG.png';
+        var backgroudSprite = new ScrollingSprite(backgroundImage, 0, 0, canvas.width, canvas.height, 1);
+        var backgroundSprite2 = new ScrollingSprite(backgroundImage, -canvas.width, 0, canvas.width, canvas.height, 1);
+        var bakcgroundBuildingsImage = new Image();
+        bakcgroundBuildingsImage.src = '/images/11/Background 1.png';
+        var backgroundBuildingsSprite = new ScrollingSprite(bakcgroundBuildingsImage, 0, 0, canvas.width, canvas.height, 2);
+        var backgroundBuildingsSprite2 = new ScrollingSprite(bakcgroundBuildingsImage, -canvas.width, 0, canvas.width, canvas.height);
+        var bridgeImage = new Image();
+        bridgeImage.src = '/images/11/Middle.png';
+        var middleSprite = new ScrollingSprite(bridgeImage, 0, 0, canvas.width, canvas.height, 2.5);
+        var middleSprite2 = new ScrollingSprite(bridgeImage, -canvas.width, 0, canvas.width, canvas.height, 2.5);
+        var foregroundBuildingImage = new Image();
+        foregroundBuildingImage.src = '/images/11/Foreground.png';
+        var foregroundBuildingSprite = new ScrollingSprite(foregroundBuildingImage, 0, 0, canvas.width, canvas.height, 3);
+        var foregroundBuildingSprite2 = new ScrollingSprite(foregroundBuildingImage, -canvas.width, 0, canvas.width, canvas.height, 3);
+        var spriteArray = [backgroudSprite];
+        var render = function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spriteArray.forEach(function(sprite){
+                sprite.scroll();
+                sprite.draw(ctx);
+            });
+            window.requestAnimationFrame(render);
+        }
+        render();
+    };
+    </script>
+
+<p>And the other one is to <em>add another image next to current one. And reposition image once it is out of screen area.</em></p>
+<p>Take a look at this example, where black box represents screen area.</p>
+
+<canvas id="parallax-scrolling-canvas-5" style="width:50%;" onload=""></canvas>
+    <script>
+    'use strict';
+    var _createClass5 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor5 = props[i]; descriptor5.enumerable = descriptor5.enumerable || false; descriptor5.configurable = true; if ("value" in descriptor5) descriptor5.writable = true; Object.defineProperty(target, descriptor5.key, descriptor5); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+    function _classCallCheck5(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+    var ScrollingSprite5 = function () {
+        function ScrollingSprite5(image, x, y, width, height, speed) {
+            _classCallCheck5(this, ScrollingSprite5);
+            this.image = image;
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            this.speed = speed;
+        }
+        _createClass5(ScrollingSprite5, [{
+            key: 'scroll',
+            value: function scroll() {
+                this.x -= this.speed;
+                if (this.x <= 0) {
+                    this.x = this.width * 2- 1;
+                }
+            }
+        }, {
+            key: 'draw',
+            value: function draw(ctx) {
+                ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+            }
+        }]);
+        return ScrollingSprite5;
+    }();
+    window.example5 = function () {
+        var canvas = document.getElementById("parallax-scrolling-canvas-5");
+        var ctx = canvas.getContext('2d');
+        var backgroundImage = new Image();
+        backgroundImage.src = '/images/11/BG.png';
+        var backgroudSprite = new ScrollingSprite5(backgroundImage, canvas.width / 3, 0, canvas.width / 3, canvas.height, 1);
+        var backgroundSprite2 = new ScrollingSprite5(backgroundImage, canvas.width / 3 + canvas.width / 3, 0, canvas.width / 3, canvas.height, 1);
+        var spriteArray = [backgroudSprite, backgroundSprite2];
+        var render = function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spriteArray.forEach(function(sprite){
+                sprite.scroll();
+                sprite.draw(ctx);
+            });
+            ctx.rect(canvas.width / 3, 0, canvas.width/3, canvas.height);
+            ctx.stroke();
+            window.requestAnimationFrame(render);
+        }
+        render();
+    };
+    </script>
+
+<p>Or better yet final example with all images </p>
+
+
+<canvas id="parallax-scrolling-canvas-6" style="width:50%;" onload=""></canvas>
+<script>
+ window.example6 = function () {
+        var canvas = document.getElementById("parallax-scrolling-canvas-6");
+        var ctx = canvas.getContext('2d');
+        var backgroundImage = new Image();
+        backgroundImage.src = '/images/11/BG.png';
+        var backgroudSprite = new ScrollingSprite5(backgroundImage, canvas.width / 3, 0, canvas.width / 3, canvas.height, 1/3);
+        var backgroundSprite2 = new ScrollingSprite5(backgroundImage, canvas.width / 3 + canvas.width / 3, 0, canvas.width / 3, canvas.height, 1/3);  var bakcgroundBuildingsImage = new Image();
+        bakcgroundBuildingsImage.src = '/images/11/Background 1.png';
+        var backgroundBuildingsSprite = new ScrollingSprite5(bakcgroundBuildingsImage, canvas.width / 3, 0, canvas.width /3, canvas.height, 2/3);
+        var backgroundBuildingsSprite2 = new ScrollingSprite5(bakcgroundBuildingsImage,  canvas.width / 3 + canvas.width / 3, 0, canvas.width /3, canvas.height,2/3);
+        var bridgeImage = new Image();
+        bridgeImage.src = '/images/11/Middle.png';
+        var middleSprite = new ScrollingSprite5(bridgeImage, canvas.width / 3, 0, canvas.width /3, canvas.height, 2.5/3);
+        var middleSprite2 = new ScrollingSprite5(bridgeImage,  canvas.width / 3 + canvas.width / 3, 0, canvas.width / 3, canvas.height, 2.5/3);
+        var foregroundBuildingImage = new Image();
+        foregroundBuildingImage.src = '/images/11/Foreground.png';
+        var foregroundBuildingSprite = new ScrollingSprite5(foregroundBuildingImage, canvas.width / 3, 0, canvas.width /3, canvas.height, 3/3);
+        var foregroundBuildingSprite2 = new ScrollingSprite5(foregroundBuildingImage,  canvas.width / 3 + canvas.width / 3, 0, canvas.width /3, canvas.height, 3/3);
+       var spriteArray = [backgroudSprite, backgroundSprite2, backgroundBuildingsSprite, backgroundBuildingsSprite2, middleSprite, middleSprite2, foregroundBuildingSprite, foregroundBuildingSprite2];
+         var render = function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spriteArray.forEach(function(sprite){
+                sprite.scroll();
+                sprite.draw(ctx);
+            });
+            ctx.rect(canvas.width / 3, 0, canvas.width/3, canvas.height);
+            ctx.stroke();
+            window.requestAnimationFrame(render);
+        }
+        render();
+    };
+</script>
+
+<p>So next part would be to add second image and code for moving image. Notice code for wrapping image as well.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">"render-canvas"</span>);</span><br><span class="line">    <span class="keyword">const</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> backgroundImage = <span class="keyword">new</span> Image();</span><br><span class="line">    backgroundImage.src = <span class="string">'./assets/BG.png'</span>;</span><br><span class="line">    backgroundImage.position = &#123; <span class="attr">x</span>: <span class="number">0</span>, <span class="attr">y</span>: <span class="number">0</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> backgroundImage2 = <span class="keyword">new</span> Image();</span><br><span class="line">    backgroundImage2.src = <span class="string">'./assets/BG.png'</span>;</span><br><span class="line">    backgroundImage2.position = &#123; <span class="attr">x</span>: canvas.width, <span class="attr">y</span>: <span class="number">0</span> &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> render = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height);</span><br><span class="line"></span><br><span class="line">        ctx.drawImage(backgroundImage, backgroundImage.position.x, backgroundImage.position.y, canvas.width, canvas.height);</span><br><span class="line">        backgroundImage.position.x -= <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        ctx.drawImage(backgroundImage2, backgroundImage2.position.x, backgroundImage2.position.y, canvas.width, canvas.height);</span><br><span class="line">        backgroundImage2.position.x -= <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// This code will wrap image</span></span><br><span class="line">        <span class="keyword">if</span>(backgroundImage.position.x &lt;= -canvas.width)&#123;</span><br><span class="line">            backgroundImage.position.x = canvas.width;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(backgroundImage2.position.x &lt;= -canvas.width)&#123;</span><br><span class="line">            backgroundImage2.position.x = canvas.width;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">window</span>.requestAnimationFrame(render);</span><br><span class="line">    &#125;</span><br><span class="line">    render();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Right now, looking at code there is logic for movement, logic for wrapping and some general properties that need to be passed to draw image call. Let’s create a class that will wrap that functionality nicely. Add <em>ScrollingSprite</em> class before or after onload call.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ScrollingSprite</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(image, x, y, width, height, speed) &#123;</span><br><span class="line">        <span class="keyword">this</span>.image = image;</span><br><span class="line">        <span class="keyword">this</span>.x = x;</span><br><span class="line">        <span class="keyword">this</span>.y = y;</span><br><span class="line">        <span class="keyword">this</span>.width = width;</span><br><span class="line">        <span class="keyword">this</span>.height = height;</span><br><span class="line">        <span class="keyword">this</span>.speed = speed;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    scroll() &#123;</span><br><span class="line">        <span class="keyword">this</span>.x -= <span class="keyword">this</span>.speed;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.x &lt;= -<span class="keyword">this</span>.width) &#123;</span><br><span class="line">            <span class="keyword">this</span>.x = <span class="keyword">this</span>.width - <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    draw(ctx) &#123;</span><br><span class="line">        ctx.drawImage(<span class="keyword">this</span>.image, <span class="keyword">this</span>.x, <span class="keyword">this</span>.y, <span class="keyword">this</span>.width, <span class="keyword">this</span>.height);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>And change onload call to this.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">"render-canvas"</span>);</span><br><span class="line">    <span class="keyword">const</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> backgroundImage = <span class="keyword">new</span> Image();</span><br><span class="line">    backgroundImage.src = <span class="string">'./assets/BG.png'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> backgroudSprite = <span class="keyword">new</span> ScrollingSprite(backgroundImage, <span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">const</span> backgroundSprite2 = <span class="keyword">new</span> ScrollingSprite(backgroundImage, -canvas.width, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> spriteArray = [</span><br><span class="line">        backgroudSprite,</span><br><span class="line">        backgroundSprite2</span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Draw loop</span></span><br><span class="line">    <span class="keyword">const</span> render = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height);</span><br><span class="line"></span><br><span class="line">        spriteArray.forEach(<span class="function"><span class="params">sprite</span> =&gt;</span> &#123;</span><br><span class="line">            sprite.scroll();</span><br><span class="line">            sprite.draw(ctx);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">window</span>.requestAnimationFrame(render);</span><br><span class="line">    &#125;</span><br><span class="line">    render();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.onload = fun</span><br></pre></td></tr></table></figure>
+<p>As you can see new images with different speed can be added in a nice way now.<br>This is final code with all images.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ScrollingSprite</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(image, x, y, width, height, speed) &#123;</span><br><span class="line">        <span class="keyword">this</span>.image = image;</span><br><span class="line">        <span class="keyword">this</span>.x = x;</span><br><span class="line">        <span class="keyword">this</span>.y = y;</span><br><span class="line">        <span class="keyword">this</span>.width = width;</span><br><span class="line">        <span class="keyword">this</span>.height = height;</span><br><span class="line">        <span class="keyword">this</span>.speed = speed;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    scroll() &#123;</span><br><span class="line">        <span class="keyword">this</span>.x -= <span class="keyword">this</span>.speed;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.x &lt;= -<span class="keyword">this</span>.width) &#123;</span><br><span class="line">            <span class="keyword">this</span>.x = <span class="keyword">this</span>.width - <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    draw(ctx) &#123;</span><br><span class="line">        ctx.drawImage(<span class="keyword">this</span>.image, <span class="keyword">this</span>.x, <span class="keyword">this</span>.y, <span class="keyword">this</span>.width, <span class="keyword">this</span>.height);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">window</span>.onload = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">"render-canvas"</span>);</span><br><span class="line">    <span class="keyword">const</span> ctx = canvas.getContext(<span class="string">'2d'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> backgroundImage = <span class="keyword">new</span> Image();</span><br><span class="line">    backgroundImage.src = <span class="string">'./assets/BG.png'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> backgroudSprite = <span class="keyword">new</span> ScrollingSprite(backgroundImage, <span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">const</span> backgroundSprite2 = <span class="keyword">new</span> ScrollingSprite(backgroundImage, -canvas.width, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> bakcgroundBuildingsImage = <span class="keyword">new</span> Image();</span><br><span class="line">    bakcgroundBuildingsImage.src = <span class="string">'./assets/Background 1.png'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> backgroundBuildingsSprite = <span class="keyword">new</span> ScrollingSprite(bakcgroundBuildingsImage, <span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">2</span>);</span><br><span class="line">    <span class="keyword">const</span> backgroundBuildingsSprite2 = <span class="keyword">new</span> ScrollingSprite(bakcgroundBuildingsImage, -canvas.width, <span class="number">0</span>, canvas.width, canvas.height);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> bridgeImage = <span class="keyword">new</span> Image();</span><br><span class="line">    bridgeImage.src = <span class="string">'./assets/Middle.png'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> middleSprite = <span class="keyword">new</span> ScrollingSprite(bridgeImage, <span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">2.5</span>);</span><br><span class="line">    <span class="keyword">const</span> middleSprite2 = <span class="keyword">new</span> ScrollingSprite(bridgeImage, -canvas.width, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">2.5</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> foregroundBuildingImage = <span class="keyword">new</span> Image();</span><br><span class="line">    foregroundBuildingImage.src = <span class="string">'./assets/Foreground.png'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> foregroundBuildingSprite = <span class="keyword">new</span> ScrollingSprite(foregroundBuildingImage, <span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">const</span> foregroundBuildingSprite2 = <span class="keyword">new</span> ScrollingSprite(foregroundBuildingImage, -canvas.width, <span class="number">0</span>, canvas.width, canvas.height, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> spriteArray = [</span><br><span class="line">        backgroudSprite,</span><br><span class="line">        backgroundSprite2,</span><br><span class="line">        backgroundBuildingsSprite,</span><br><span class="line">        backgroundBuildingsSprite2,</span><br><span class="line">        middleSprite,</span><br><span class="line">        middleSprite2,</span><br><span class="line">        foregroundBuildingSprite,</span><br><span class="line">        foregroundBuildingSprite2</span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Draw loop</span></span><br><span class="line">    <span class="keyword">const</span> render = <span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">        ctx.clearRect(<span class="number">0</span>, <span class="number">0</span>, canvas.width, canvas.height);</span><br><span class="line"></span><br><span class="line">        spriteArray.forEach(<span class="function"><span class="params">sprite</span> =&gt;</span> &#123;</span><br><span class="line">            sprite.scroll();</span><br><span class="line">            sprite.draw(ctx);</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">window</span>.requestAnimationFrame(render);</span><br><span class="line">    &#125;</span><br><span class="line">    render();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    <canvas id="parallax-scrolling-canvas-7" style="width:50%"></canvas>
+    <script>
+    'use strict';
+    window.example7 = function () {
+        var canvas = document.getElementById("parallax-scrolling-canvas-7");
+        var ctx = canvas.getContext('2d');
+        var backgroundImage = new Image();
+        backgroundImage.src = '/images/11/BG.png';
+        var backgroudSprite = new ScrollingSprite(backgroundImage, 0, 0, canvas.width, canvas.height, 1);
+        var backgroundSprite2 = new ScrollingSprite(backgroundImage, -canvas.width, 0, canvas.width, canvas.height, 1);
+        var bakcgroundBuildingsImage = new Image();
+        bakcgroundBuildingsImage.src = '/images/11/Background 1.png';
+        var backgroundBuildingsSprite = new ScrollingSprite(bakcgroundBuildingsImage, 0, 0, canvas.width, canvas.height, 2);
+        var backgroundBuildingsSprite2 = new ScrollingSprite(bakcgroundBuildingsImage, -canvas.width, 0, canvas.width, canvas.height);
+        var bridgeImage = new Image();
+        bridgeImage.src = '/images/11/Middle.png';
+        var middleSprite = new ScrollingSprite(bridgeImage, 0, 0, canvas.width, canvas.height, 2.5);
+        var middleSprite2 = new ScrollingSprite(bridgeImage, -canvas.width, 0, canvas.width, canvas.height, 2.5);
+        var foregroundBuildingImage = new Image();
+        foregroundBuildingImage.src = '/images/11/Foreground.png';
+        var foregroundBuildingSprite = new ScrollingSprite(foregroundBuildingImage, 0, 0, canvas.width, canvas.height, 3);
+        var foregroundBuildingSprite2 = new ScrollingSprite(foregroundBuildingImage, -canvas.width, 0, canvas.width, canvas.height, 3);
+        var spriteArray = [backgroudSprite, backgroundSprite2, backgroundBuildingsSprite, backgroundBuildingsSprite2, middleSprite, middleSprite2, foregroundBuildingSprite, foregroundBuildingSprite2];
+        var render = function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            spriteArray.forEach(function(sprite){
+                sprite.scroll();
+                sprite.draw(ctx);
+            });
+            window.requestAnimationFrame(render);
+        }
+        render();
+    };
+    </script>
+    
+
+<p>As always code is available on <a href="https://github.com/luka712/parallax-scrolling" target="_blank" rel="noopener">github</a>. There is also sample on <a href="https://codepen.io/luka712/pen/XoWbJY" target="_blank" rel="noopener">Codepen</a>.</p>
+
+<script>
+window.example1();
+window.example2();
+window.example3();
+window.example4();
+window.example5();
+window.example6();
+window.example7();
+</script>
+
+</article></main><script src="https://code.jquery.com/jquery-3.3.1.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/babylonjs/3.3.0-alpha.12/babylon.js"></script><script src="https://preview.babylonjs.com/loaders/babylonjs.loaders.js"></script><script src="https://preview.babylonjs.com/gui/babylon.gui.js"></script><script src="/scripts/index.js" type="text/javascript"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+e.src='//www.google-analytics.com/analytics.js';
+r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+ga('create','UA-121717766-1');ga('send','pageview');</script></body></html>
